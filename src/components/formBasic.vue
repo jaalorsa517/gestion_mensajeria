@@ -1,20 +1,25 @@
 <template lang="pug">
-	form#form-basic(@submit.prevent="onSubmit")
-		.info(v-show="errors.length")
-			ul(v-for="error in errors")
-				li {{error}}
-		h2 {{title}}
-		input.username(autocomplete="username" name="username" v-model="username" placeholder="Nombre de usuario")
-		input.password(type="password" name="username" v-model="password" placeholder="Contraseña")
-		input.submit(type="submit" value="Confirmar")
-		slot
+  form#form-basic(@submit.prevent="onSubmit")
+    .info(v-show="errors.length")
+      ul(v-for="error in errors")
+        li {{error}}
+    h2 {{title}}
+    input.username(autocomplete="username" name="username" v-model="username" placeholder="Nombre de usuario")
+    input.password(type="password" name="username" v-model="password" placeholder="Contraseña")
+    input.submit(v-if="!isRequest" type="submit" value="Confirmar" ) 
+    spinner(v-else line-bg-color="#eaac7f" line-fg-color="#91684a")
+    slot
 </template>
 
 <script>
 import { post, get } from "@scripts/consumer_api.js";
+import Spinner from "vue-simple-spinner";
 
 export default {
   name: "FormBasic",
+  components: {
+    Spinner,
+  },
   props: {
     title: {
       type: String,
@@ -27,13 +32,18 @@ export default {
       password: "",
       response: null,
       errors: [],
+      isRequest: false,
     };
   },
   methods: {
     onSubmit: function() {
       // console.log(this.$router.path);
       if (this.validate(this.username) && this.validate(this.password)) {
-        get('/').then((response)=>console.log(response))
+        this.isRequest = true;
+        get("/").then((response) => {
+          console.log(response);
+          this.isRequest = false;
+        });
         // post(this.$router.path, {
         //   username: this.username,
         //   password: this.password,
