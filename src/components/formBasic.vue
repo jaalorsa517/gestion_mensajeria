@@ -31,9 +31,13 @@ export default {
   },
   methods: {
     onSubmit: function() {
+      // console.log(this.$router.path);
       if (this.validate(this.username) && this.validate(this.password)) {
-				this.axios.get('localhost:5000/api/v1/')
-				// post("/signin", { username: this.username, password: this.password })
+        get('/').then((response)=>console.log(response))
+        // post(this.$router.path, {
+        //   username: this.username,
+        //   password: this.password,
+        // })
         //   .then((response) => console.log("respuesta es " + response))
         //   .catch((error) => console.log(error.toJSON()));
       } else {

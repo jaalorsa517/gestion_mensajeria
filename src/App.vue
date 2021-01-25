@@ -32,7 +32,7 @@ input
   shadow-box()
 
 #app
-  size-box(100%,100)
+  size-box(100%,100%)
   font-family Avenir, Helvetica, Arial, sans-serif
   text-align center
   color color-fonts
