@@ -9,13 +9,17 @@ const instance = axios.create({
   },
 });
 
-function get(url) {
-  return instance.get(url);
+function get(url, auth = null) {
+  return !auth ? instance.get(url) : instance.get(url, { auth });
 }
 
-function post(url, body, header = {}) {
+function post(url, body) {
+  return instance.post(url, JSON.stringify(body));
+}
+
+function patch(url, body, auth) {
   JSON.stringify(body);
-  return instance.post(url, body);
+  return instance.patch(url, JSON.stringify(body), { auth });
 }
 
-export { get, post };
+export { get, post, patch };

@@ -1,8 +1,8 @@
 <template lang="pug">
   form#form-basic(@submit.prevent="onSubmit")
-    .info(v-show="errors.length")
-      ul(v-for="error in errors")
-        li {{error}}
+    .info(v-show="messages.length")
+      ul(v-for="msg in messages")
+        li {{msg}}
     h2 {{title}}
     input.username(autocomplete="username" name="username" v-model="username" placeholder="Nombre de usuario")
     input.password(type="password" name="username" v-model="password" placeholder="Contraseña")
@@ -31,33 +31,52 @@ export default {
       username: "",
       password: "",
       response: null,
-      errors: [],
+      messages: [],
       isRequest: false,
     };
   },
   methods: {
     onSubmit: function() {
-      // console.log(this.$router.path);
       if (this.validate(this.username) && this.validate(this.password)) {
         this.isRequest = true;
-        get("/").then((response) => {
-          console.log(response);
-          this.isRequest = false;
-        });
-        // post(this.$router.path, {
-        //   username: this.username,
-        //   password: this.password,
-        // })
-        //   .then((response) => console.log("respuesta es " + response))
-        //   .catch((error) => console.log(error.toJSON()));
+        post(this.$route.path, {
+          username: this.username,
+          password: this.password,
+        })
+          .then((response) => {
+            switch(this.$route.path){
+              case "/signin":
+                if (response.data.code == 201){
+                  this.$router.push('/login')
+                }
+                break;
+              case "/login":
+                if (response.data.code == 200){
+                  sessionStorage.setItem('username',this.username)
+                  sessionStorage.setItem('password',this.password)
+                  this.$router.push("/dashboard")
+                }
+                break;
+            }
+            this.isRequest = false;
+          })
+          .catch((error) => {
+            if (error.response.status === 401) {
+              this.showInfo(error.response.data.message);
+              this.isRequest = false;
+            }
+          });
       } else {
-        this.errors.push("Rellene los campos");
-        setTimeout(() => {
-          this.errors.pop();
-        }, 3000);
+        this.showInfo("Rellene los campos");
       }
     },
     validate: (data) => (data ? true : false),
+    showInfo: function(msg) {
+      this.messages.push(msg);
+      setTimeout(() => {
+        this.messages.pop();
+      }, 3000);
+    },
   },
 };
 </script>
